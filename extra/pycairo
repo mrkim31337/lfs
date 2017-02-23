@@ -1,0 +1,40 @@
+pkgbuild_version=5
+pkgname=pycairo
+pkgver=1.10.0
+
+dependencies=(
+    "!$pkgname"
+	'Python3'
+	'cairo'
+)
+sources=(
+	"http://cairographics.org/releases/${pkgname}-${pkgver}.tar.bz2"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/pycairo-1.10.0-waf_unpack-1.patch"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/pycairo-1.10.0-waf_python_3_4-1.patch"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i ${sources_dir}/pycairo-1.10.0-waf_unpack-1.patch 
+	wafdir=$(./waf unpack)
+	pushd $wafdir
+	patch -Np1 -i ${sources_dir}/pycairo-1.10.0-waf_python_3_4-1.patch
+	popd
+	unset wafdir
+	PYTHON=/usr/bin/python3 ./waf configure --prefix=/usr
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./waf build
+}
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./waf  install --destdir=${fakeroot_dir}
+}
+

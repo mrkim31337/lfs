@@ -1,0 +1,45 @@
+pkgbuild_version=5
+pkgname=budgie-desktop
+pkgver=git
+
+dependencies=(
+    "!$pkgname"
+	'gnome-bluetooth'
+	'gnome-menus'
+	'gnome-session'
+	'gnome-themes-standard'
+	'mutter'
+	'accountsservice'
+	'gnome-desktop'
+	'pulseaudio'
+	'gnome-backgrounds'
+	'gnome-control-center'
+#	'gnome-screensaver'
+	'network-manager-applet'
+	'gtk-doc'
+)
+sources=(
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+
+	cd "${build_dir}"
+	git clone https://github.com/solus-project/budgie-desktop
+	cd ${pkgname}
+	./autogen.sh --prefix=/usr
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}"
+	make
+
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

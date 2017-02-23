@@ -1,0 +1,44 @@
+pkgbuild_version=5
+pkgname=thunderbird-bin
+_pkgname=thunderbird
+pkgver=45.7.0
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'gtk+2'
+)
+sources=(
+	"https://download-installer.cdn.mozilla.net/pub/thunderbird/releases/${pkgver}/linux-x86_64/en-US/thunderbird-${pkgver}.tar.bz2"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+
+	mkdir "${build_dir}/${pkgname}-${pkgver}"
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	cp ${sources_dir}/${_pkgname}-${pkgver}.tar.bz2 .
+}
+
+lfs_me_build() {	
+	return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	mkdir ${fakeroot_dir}/opt/
+	mkdir -pv ${fakeroot_dir}/etc/profile.d
+	cat > ${fakeroot_dir}/etc/profile.d/thunderbird.sh << "EOF"
+# Begin /etc/profile.d/thunderbird.sh
+
+THUNDERDIR=/opt/thunderbird
+export THUNDERDIR
+pathappend $THUNDERDIR
+
+# End /etc/profile.d/thunderbird.sh
+EOF
+
+	tar -xiC "${fakeroot_dir}/opt/" -f ${_pkgname}-${pkgver}.tar.bz2
+}

@@ -1,0 +1,33 @@
+pkgbuild_version=5
+pkgname=exiv2
+pkgver=0.25
+
+dependencies=(
+    "!$pkgname"
+	'curl'
+)
+sources=(
+	"http://www.exiv2.org/${pkgname}-${pkgver}.tar.gz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr     \
+            --enable-video    \
+            --enable-webready \
+            --without-ssh     \
+            --disable-static 
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+	chmod -v 755 ${fakeroot_dir}/usr/lib/libexiv2.so
+}
+

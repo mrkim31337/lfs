@@ -1,0 +1,30 @@
+pkgbuild_version=5
+pkgname=faac
+pkgver=1.28
+
+dependencies=(
+    "!$pkgname"
+)
+sources=(
+	"http://downloads.sourceforge.net/faac/${pkgname}-${pkgver}.tar.bz2"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/faac-1.28-glibc_fixes-1.patch"
+)
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i ${sources_dir}/faac-1.28-glibc_fixes-1.patch
+	sed -i -e '/obj-type/d' -e '/Long Term/d' frontend/main.c
+	CFLAGS=-std=c99 CXXFLAGS=-std=c++98 \
+	./configure --prefix=/usr --disable-static
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

@@ -1,0 +1,53 @@
+pkgbuild_version=5
+pkgname=virtualbox-bin
+pkgver=5.1.14
+_build=112924
+_arch=amd64
+_installdir=/opt/VirtualBox
+dependencies=(
+    "!$pkgname"
+	'glibc'
+)
+sources=(
+
+"http://download.virtualbox.org/virtualbox/${pkgver}/VirtualBox-${pkgver}-${_build}-Linux_${_arch}.run"	
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	mkdir ${build_dir}/vbox
+	echo yes | sh "${sources_dir}/VirtualBox-$pkgver-$_build-Linux_$_arch.run" --target "$build_dir/vbox/" \
+    	--nox11 --noexec &> /dev/null
+}
+
+lfs_me_build() {
+	return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/vbox"
+	install -d "$fakeroot_dir/$_installdir"
+        tar -jxf "VirtualBox.tar.bz2" -C "$fakeroot_dir/$_installdir"
+        install -D -m 0644 /dev/null "$fakeroot_dir/etc/vbox/vbox.cfg"
+        cat > "$fakeroot_dir/etc/vbox/vbox.cfg" <<EOF
+# VirtualBox installation directory"
+INSTALL_DIR='$_installdir'
+
+# VirtualBox version
+INSTALL_VER='$pkgver'
+INSTALL_REV='$_build'
+EOF
+
+	cat > ${fakeoot_dir}/etc/profile.d/vbox.sh << "EOF"
+# Begin /etc/profile.d/vbox.sh
+
+VBOXDIR=/opt/VirtualBox
+export VBOXDIR
+pathappend $VBOXDIR
+
+# End /etc/profile.d/vbox.sh
+EOF
+
+}

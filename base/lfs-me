@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=lfs-me
+pkgver=3.1.2
+
+dependencies=(
+    "!$pkgname"
+    'bash'
+    'bc'
+    'rsync'
+    'coreutils'
+    'grep'
+    'sed'
+    'gawk'
+    'make'
+)
+sources=(
+	"https://raw.githubusercontent.com/fanboimsft/lfs-script/master/misc/lfs-me"
+)
+sha1sums=(
+    16b37a721ae6c974a8ff73ee8e0787d6e7c5a0cb
+)
+
+lfs_me_prepare() {
+	return
+}
+
+lfs_me_build() {
+    return
+}
+
+lfs_me_check() {
+    return
+}
+
+lfs_me_install() {
+    mkdir -pv "${fakeroot_dir}/usr/bin"
+
+    install -v -m 755 ${sources_dir}/lfs-me "${fakeroot_dir}/usr/bin"
+}
+
+# vim:set syntax=sh et:

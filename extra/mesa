@@ -1,0 +1,63 @@
+pkgbuild_version=5
+pkgname=mesa
+pkgver=13.0.4
+
+dependencies=(
+	"!$pkgname"
+	'libdrm'
+#	'Python<3'
+	'xorg-libraries'
+)
+sources=(
+	"ftp://ftp.freedesktop.org/pub/mesa/${pkgver}/${pkgname}-${pkgver}.tar.xz"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/${pkgname}-${pkgver}-add_xdemos-1.patch"
+)
+sha1sums=(
+	f8bfea45c8ef09431e6cccbee68ca2c517e6cbbc
+	d1624c545cb6c8131e50d901f659032506e5e9d8
+	0bed9cbd1f1b39e39815e8815a896636876ceb82
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname/Lib/}-${pkgver}"
+
+	patch -Np1 -i "${sources_dir}/${pkgname}-${pkgver}-add_xdemos-1.patch"
+
+	sed -i "/pthread_stubs_possible=/s/yes/no/" configure.ac
+	sed -i "/seems to be moved/s/^/: #/" bin/ltmain.sh
+
+
+	./autogen.sh CFLAGS="-O2" CXXFLAGS="-O2" \
+	        --prefix=$XORG_PREFIX                \
+		--sysconfdir=/etc            \
+		--enable-texture-float       \
+		--enable-osmesa              \
+		--enable-xa                  \
+		--enable-gbm                 \
+		--enable-glx-tls             \
+		--with-egl-platforms="drm,x11,wayland" \
+		--with-gallium-drivers="svga,swrast,radeonsi"
+}
+
+lfs_me_build() {
+	cd "${build_dir}/${pkgname/Lib/}-${pkgver}"
+	make
+	make -C xdemos DEMOS_PREFIX=/usr
+}
+
+lfs_me_check() {
+	return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname/Lib/}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+
+	make DESTDIR="$fakeroot_dir" -C xdemos DEMOS_PREFIX=/usr install
+	install -v -dm755 "${fakeroot_dir}/usr/share/doc/${pkgname}-${pkgver}"
+	cp -rfv docs/* "${fakeroot_dir}/usr/share/doc/${pkgname}-${pkgver}"
+}
+
+# vim:set ts=4 syntax=sh:

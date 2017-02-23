@@ -1,0 +1,93 @@
+pkgbuild_version=5
+pkgname=systemd
+pkgver=232
+
+dependencies=(
+    "!$pkgname"
+	'acl'
+	'bash'
+	'kmod'
+	'libcap'
+	'Linux-PAM'
+	'polkit'
+)
+sources=(
+	"https://github.com/systemd/systemd/archive/v232.tar.gz"
+)
+
+sha1sums=(
+	0d933a2f76db5d30f52429e9b172323bc6abd49a
+	a541716c3ab62a6fae35d6bdb27767b569a942ba
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/v${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./autogen.sh
+    
+    ./configure --prefix=/usr          \
+    --libexecdir=/usr/lib \
+    --localstatedir=/var \
+    --sysconfdir=/etc \
+    --disable-audit \
+    --disable-ima \
+    --with-sysvinit-path= \
+    --with-sysvrcnd-path= \
+    --with-ntp-servers="0.arch.pool.ntp.org" \
+    --with-default-dnssec=no \
+    --with-dbuspolicydir=/usr/share/dbus-1/system.d \
+    --without-kill-user-processes
+    
+				
+}
+
+
+
+lfs_me_install() {
+		cd "${build_dir}/${pkgname}-${pkgver}"
+		make LD_LIBRARY_PATH=/tools/lib DESTDIR="${fakeroot_dir}" install
+
+		rm -rfv "${fakeroot_dir}/usr/lib/rpm"
+		mkdir ${fakeroot_dir}/sbin
+
+}
+
+lfs_me_postinstall() {
+
+	for tool in runlevel reboot shutdown poweroff halt telinit; do
+    	ln -sfv /bin/systemctl /sbin/${tool}
+	done
+	ln -sfv /usr/lib/systemd/systemd /sbin/init
+
+
+
+	cat >> /etc/pam.d/system-session << "EOF"
+	# Begin Systemd addition
+    
+	session   required    pam_loginuid.so
+	session   optional    pam_systemd.so
+
+	# End Systemd addition
+EOF
+
+	cat >> /etc/pam.d/systemd-user << "EOF"
+	# Begin /etc/pam.d/systemd-user
+
+	account  required pam_access.so
+	account  include  system-account
+
+	session  required pam_env.so
+	session  required pam_limits.so
+	session  include  system-session
+
+	auth     required pam_deny.so
+	password required pam_deny.so
+
+	# End /etc/pam.d/systemd-user
+EOF
+	
+
+}
+
+# vim:set syntax=sh et:

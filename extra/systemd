@@ -1,0 +1,106 @@
+pkgbuild_version=5
+pkgname=systemd
+pkgver=master
+
+dependencies=(
+    "!$pkgname"
+	'acl'
+	'bash'
+	'kmod'
+	'libcap'
+	'Linux-PAM'
+	'ca-certificates'
+	'curl'
+	'gnutls'
+)
+sources=(
+	#"http://anduin.linuxfromscratch.org/sources/other/systemd/${pkgname}-${pkgver}.tar.xz"
+	"https://github.com/systemd/systemd/archive/master.zip"
+)
+
+sha1sums=(
+	0d933a2f76db5d30f52429e9b172323bc6abd49a
+	a541716c3ab62a6fae35d6bdb27767b569a942ba
+)
+
+lfs_me_prepare() {
+	#tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+	unzip ${sources_dir}/master.zip -d ${build_dir}/
+	
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	intltoolize
+	autoreconf -vi    
+
+        sed -e 's@test/udev-test.pl @@'  \
+    	-e 's@test-copy$(EXEEXT) @@' \
+        -i Makefile.in
+
+	cc_cv_CFLAGS__flto=no               \
+	./configure --prefix=/usr            \
+            --sysconfdir=/etc        \
+            --localstatedir=/var     \
+            --with-rootprefix=       \
+            --with-rootlibdir=/lib   \
+            --enable-split-usr       \
+            --disable-firstboot      \
+            --disable-ldconfig       \
+            --disable-sysusers       \
+            --without-python         \
+            --with-default-dnssec=no \
+            --docdir=/usr/share/doc/systemd-${pkgver}
+    
+				
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make -j5
+}
+
+lfs_me_install() {
+		cd "${build_dir}/${pkgname}-${pkgver}"
+		make LD_LIBRARY_PATH=/tools/lib DESTDIR="${fakeroot_dir}" install
+
+		rm -rfv "${fakeroot_dir}/usr/lib/rpm"
+		mkdir ${fakeroot_dir}/sbin
+
+}
+
+lfs_me_postinstall() {
+
+	for tool in runlevel reboot shutdown poweroff halt telinit; do
+    	ln -sfv /bin/systemctl /sbin/${tool}
+	done
+	ln -sfv /usr/lib/systemd/systemd /sbin/init
+
+	systemd-machine-id-setup
+
+	cat >> /etc/pam.d/system-session << "EOF"
+	# Begin Systemd addition
+
+	session   required    pam_loginuid.so
+	session   required    pam_systemd.so
+
+	# End Systemd addition
+EOF
+
+	cat > /etc/pam.d/systemd-user << "EOF"
+	# Begin /etc/pam.d/systemd-user
+
+	account  required pam_access.so
+	account  include  system-account
+
+	session  required pam_env.so
+	session  required pam_limits.so
+	session  include  system-session
+
+	auth     required pam_deny.so
+	password required pam_deny.so
+
+	# End /etc/pam.d/systemd-user
+EOF
+
+
+}
+
+# vim:set syntax=sh et:

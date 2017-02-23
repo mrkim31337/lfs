@@ -1,0 +1,44 @@
+pkgbuild_version=5
+pkgname=open-vm-tools
+pkgver=10.1.0
+
+dependencies=(
+    "!$pkgname"
+    'libmspack'
+    'gtkmm2'
+    'libdnet'
+    'xf86-video-vmware'
+)
+sources=(
+	"https://github.com/vmware/open-vm-tools/archive/stable-${pkgver/_/-}.tar.gz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/stable-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-stable-${pkgver}/${pkgname}"
+	sed -i -e 's|-Werror||g' -e 's|.*common-agent/etc/config/Makefile.*||' configure.ac
+  	mkdir -p common-agent/etc/config
+  	autoreconf -vi
+
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-stable-${pkgver}/${pkgname}"
+	CXXFLAGS+=' -std=gnu++11 -fpermissive '
+  	CFLAGS+=' -fpermissive '
+
+  	sh ./configure --prefix=/usr \
+    	--sbindir=/usr/bin \
+    	--without-xmlsecurity \
+    	--without-kernel-modules 
+  	make
+}
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-stable-${pkgver}/${pkgname}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

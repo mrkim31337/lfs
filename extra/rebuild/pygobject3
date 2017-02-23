@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=pygobject3
+_pkgname=pygobject
+pkgver=3.22.0
+
+dependencies=(
+    "!$pkgname"
+	'glib'
+	'pycairo'
+)
+sources=(
+	
+	http://ftp.gnome.org/pub/gnome/sources/pygobject/3.22/${_pkgname}-${pkgver}.tar.xz
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${_pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+	mkdir python3
+	pushd python3
+	../configure --prefix=/usr --with-python=/usr/bin/python3
+	make
+	popd
+
+}
+
+lfs_me_build() {
+
+	return
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+	make DESTDIR=${fakeroot_dir} -C python3 install
+}
+

@@ -1,0 +1,43 @@
+pkgbuild_version=5
+pkgname=libostree
+pkgver=2017.2
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'xz'
+	'zlib'
+	'libsoup'
+	'gpgme'
+	'libarchive'
+)
+sources=(
+	"https://github.com/ostreedev/ostree/releases/download/v2017.2/${pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	  ./configure \
+	  --prefix=/usr \
+    	  --sysconfdir=/etc \
+          --localstatedir=/var \
+          --sbindir=/usr/bin \
+          --libexecdir=/usr/lib \
+	  --disable-static \
+          --enable-gtk-doc
+
+	 sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

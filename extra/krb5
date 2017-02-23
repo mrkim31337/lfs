@@ -1,0 +1,71 @@
+pkgbuild_version=5
+pkgname=krb5
+pkgver=1.14.4
+
+dependencies=(
+	"!$pkgname"
+
+)
+sources=(
+	
+	"http://web.mit.edu/kerberos/dist/krb5/1.14/${pkgname}-${pkgver}.tar.gz"
+)
+sha1sums=(
+	e0d10e8b4494383c7e366ac80a942ba45a705a96
+)
+overwrite=(
+	"/usr/include/com_err.h"
+	"/usr/bin/compile_et"
+	"/usr/share/et/et_h.awk"
+	"/usr/share/et/et_c.awk"
+	"/usr/share/man/man1/compile_et.1"
+	"/usr/lib/libcom_err.so"
+
+)
+
+lfs_me_prepare() {
+	
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	cd src
+	sed -e "s@python2.5/Python.h@& python2.7/Python.h@g" \
+    	-e "s@-lpython2.5]@&,\n  AC_CHECK_LIB(python2.7,main,[PYTHON_LIB=-lpython2.7])@g" \
+    	-i configure.in
+	
+	sed -e 's@\^u}@^u cols 300}@' \
+    	-i tests/dejagnu/config/default.exp
+
+	
+	sed -e '/eq 0/{N;s/12 //}' \
+    	-i plugins/kdb/db2/libdb2/test/run.test
+
+	autoconf
+	
+	./configure --prefix=/usr            \
+            --sysconfdir=/etc        \
+            --localstatedir=/var/lib \
+            --with-system-verto=no   \
+            --enable-dns-for-realm 
+
+
+}
+
+lfs_me_build() {
+	cd "${build_dir}/${pkgname}-${pkgver}/src"
+	make
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}/src"
+	make DESTDIR="${fakeroot_dir}" install
+
+}
+
+lfs_me_postinstall(){
+	chmod -v 755 /usr/bin/ksu
+
+}
+
+# vim:set ts=4 syntax=sh:

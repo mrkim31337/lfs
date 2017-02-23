@@ -1,0 +1,26 @@
+pkgbuild_version=5
+pkgname=libxkbcommon
+pkgver=0.7.1
+
+dependencies=(
+	"!$pkgname"
+	'xkeyboard-config'
+	'libxcb'
+)
+sources=(
+	"http://xkbcommon.org/download/${pkgname}-${pkgver}.tar.xz"
+)
+sha1sums=(
+	4df177de629b2653db322bfb891afa3c0d1fa221
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure $XORG_CONFIG     \
+         --docdir=/usr/share/doc/libxkbcommon-${pkgver}
+
+}
+
+# vim:set ts=4 syntax=sh:

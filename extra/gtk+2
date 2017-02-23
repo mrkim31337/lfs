@@ -1,0 +1,53 @@
+pkgbuild_version=5
+pkgname=gtk+2
+pkgname2=gtk+
+pkgver=2.24.31
+
+dependencies=(
+	"!$pkgname"
+	'atk'
+	'gdk-pixbuf'
+	'pango'
+	'hicolor-icon-theme'
+	'cups'
+	'gobject-introspection'
+
+
+)
+sources=(
+	"http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/${pkgname2}-${pkgver}.tar.xz"
+)
+sha1sums=(
+	c43eb248b3d30c6b49937692b4c4bfa10b96201e
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname2}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname2}-${pkgver}"
+	sed -e 's#l \(gtk-.*\).sgml#& -o \1#' \
+        -i docs/{faq,tutorial}/Makefile.in
+
+
+	sed -i "/seems to be moved/s/^/#/" ltmain.sh 
+	./configure --prefix=/usr --sysconfdir=/etc
+
+
+}
+lfs_me_build(){
+	cd "${build_dir}/${pkgname2}-${pkgver}"
+	make
+}
+lfs_me_install() {
+        cd "${build_dir}/${pkgname2}-${pkgver}"
+        make DESTDIR="${fakeroot_dir}" install
+	rm ${fakeroot_dir}/usr/bin/gtk-update-icon-cache
+
+}
+
+lfs_me_postinstall() {
+	
+	gtk-query-immodules-2.0 --update-cache
+}
+
+# vim:set ts=4 syntax=sh:

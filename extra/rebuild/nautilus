@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=nautilus
+pkgver=3.22.2
+
+dependencies=(
+    "!$pkgname"
+	'gnome-autoar'
+	'gnome-desktop'
+	'libnotify'
+	'exempi'
+	'gobject-introspection'
+	'libexif'
+)
+sources=(
+	
+	"http://ftp.gnome.org/pub/gnome/sources/nautilus/3.22/${pkgname}-${pkgver}.tar.xz"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/nautilus-3.22.2-disable_batch_rename_support-1.patch"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i $sources_dir/nautilus-3.22.2-disable_batch_rename_support-1.patch
+	./configure --prefix=/usr        \
+            --sysconfdir=/etc    \
+            --disable-selinux    \
+            --disable-tracker    \
+            --disable-packagekit \
+	    --disable-batch-rename
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

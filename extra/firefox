@@ -1,0 +1,75 @@
+pkgbuild_version=5
+pkgname=firefox
+pkgver=50.0
+
+export CFLAGS+=" -fno-delete-null-pointer-checks -fno-lifetime-dse -fno-schedule-insns2"
+export CXXFLAGS+=" -fno-delete-null-pointer-checks -fno-lifetime-dse -fno-schedule-insns2"
+
+dependencies=(
+    "!$pkgname"
+	'alsa-lib'
+	'autoconf-firefox'
+	'gtk+>3'
+	'gtk+2'
+	#'nss'
+	'unzip'
+	'yasm'
+	'zip'
+	'icu'
+	'libevent'
+	'libvpx'
+	'sqlite'
+	'curl'
+	'dbus-glib'
+	'gconf'
+	'libwebp'
+	'ffmpeg'
+	'pulseaudio'
+	'startup-notification'
+	'wget'
+	'liboauth'
+	'graphite2'
+	'harfbuzz'
+)
+sources=(
+		
+	"https://ftp.mozilla.org/pub/mozilla.org/firefox/releases/50.0/source/${pkgname}-${pkgver}.source.tar.xz"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/firefox-50.0-system_graphite2_harfbuzz-1.patch"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.source.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	cp ${sources_dir}/mozconfig mozconfig	
+	patch -Np1 -i ${sources_dir}/firefox-50.0-system_graphite2_harfbuzz-1.patch
+}
+
+lfs_me_build(){
+ 	cd "${build_dir}/${pkgname}-${pkgver}"
+	
+	make -f client.mk
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	
+	make -f client.mk DESTDIR="$fakeroot_dir" install INSTALL_SDK=
+	chown -R 0:0 ${fakeroot_dir}/usr/lib/firefox-50.0
+}
+
+lfs_me_postinstall(){
+
+	mkdir -pv    /usr/lib/mozilla/plugins
+	ln    -sfv /usr/lib/mozilla/plugins /usr/lib/firefox-50.0/browser
+
+	mkdir -pv /usr/share/applications 
+	mkdir -pv /usr/share/pixmaps 
+
+	ln -sfv /usr/lib/firefox-50.0/browser/icons/mozicon128.png \
+        /usr/share/pixmaps/firefox.png
+
+}

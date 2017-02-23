@@ -1,0 +1,57 @@
+pkgbuild_version=5
+pkgname=llvm
+pkgver=3.9.1
+
+dependencies=(
+	"!$pkgname"
+	'libffi'
+	'Python2'
+
+)
+sources=(
+	"http://llvm.org/releases/${pkgver}/${pkgname}-${pkgver}.src.tar.xz"
+	"http://llvm.org/releases/${pkgver}/cfe-${pkgver}.src.tar.xz"
+	"http://llvm.org/releases/${pkgver}/compiler-rt-${pkgver}.src.tar.xz"
+)
+sha1sums=(
+	58d817ac2ff573386941e7735d30702fe71267d5
+	834cee2ed8dc6638a486d8d886b6dce3db675ffa
+	61f3e78088ce4a0787835036f2d3c61ede11e928
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.src.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}.src"
+
+	tar -xf "${sources_dir}/cfe-${pkgver}.src.tar.xz" -C tools &&
+	tar -xf "${sources_dir}/compiler-rt-${pkgver}.src.tar.xz" -C projects &&
+
+	mv "tools/cfe-${pkgver}.src" tools/clang &&
+	mv "projects/compiler-rt-${pkgver}.src" projects/compiler-rt 
+	mkdir -v build && cd build
+        CC=gcc CXX=g++                         \
+	cmake -DCMAKE_INSTALL_PREFIX=/usr       \
+        -DLLVM_ENABLE_FFI=ON                  \
+        -DCMAKE_BUILD_TYPE=Release            \
+	-DBUILD_SHARED_LIBS=ON		     \
+        -DLLVM_TARGETS_TO_BUILD="host;AMDGPU" \
+        -Wno-dev ..         
+
+}
+
+lfs_me_build() {
+	cd "${build_dir}/${pkgname}-${pkgver}.src/build"
+	
+	
+	make -j5
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}.src/build"
+	make DESTDIR="$fakeroot_dir" install 
+
+}
+
+# vim:set ts=4 syntax=sh:

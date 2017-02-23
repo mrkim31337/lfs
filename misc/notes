@@ -1,0 +1,3 @@
+caribou: set pyton to python3 or build fails
+adwaita-icom-theme: rebuild libpng; gdk-pixbuf; librsvg
+gnome: run glib-compile-schemas /usr/share/glib-2.0/schemas

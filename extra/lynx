@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=lynx
+pkgver=2.8.8rel.2
+_pkgver=2-8-8
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'openssl'
+
+)
+sources=(
+	"ftp://lynx.isc.org/lynx/tarballs/${pkgname}${pkgver}.tar.bz2"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}${_pkgver}"
+	./configure --prefix=/usr          \
+            --sysconfdir=/etc/lynx \
+            --datadir=/usr/share/doc/lynx-${pkgver} \
+            --with-zlib            \
+            --with-bzlib           \
+            --with-screen=ncursesw \
+            --enable-locale-charset \
+	    --with-ssl
+}
+
+lfs_me_build() {
+	cd "${build_dir}/${pkgname}${_pkgver}"
+
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}${_pkgver}"
+	make DESTDIR="$fakeroot_dir" install-full
+}
+

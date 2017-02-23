@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=kmod
+pkgver=23
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'zlib'
+)
+sources=(
+	"https://www.kernel.org/pub/linux/utils/kernel/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+	6cadc3b088fa5874f712d3bbe4df75ece59c4b77
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+
+	./configure --prefix=/usr          \
+				--bindir=/bin          \
+				--sysconfdir=/etc      \
+				--with-rootlibdir=/lib \
+				--with-xz              \
+				--with-zlib
+
+}
+
+lfs_me_install(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR=${fakeroot_dir} install
+        
+	for target in depmod insmod lsmod modinfo modprobe rmmod; do
+  	ln -sfv /bin/kmod ${fakeroot_dir}/bin/$target
+	done
+	ln -sfv kmod ${fakeroot_dir}/bin/lsmod
+
+}

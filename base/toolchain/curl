@@ -1,0 +1,32 @@
+pkgbuild_version=5
+pkgname=curl
+pkgver=7.52.1
+
+dependencies=(
+    "!$pkgname"
+	'openssl'
+    'zlib'
+)
+sources=(
+    "https://curl.haxx.se/download/${pkgname}-${pkgver}.tar.bz2"
+    "http://www.linuxfromscratch.org/patches/blfs/svn/curl-7.52.1-valgrind_filter-1.patch"
+)
+sha1sums=(
+    
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i $sources_dir/curl-7.52.1-valgrind_filter-1.patch
+	./configure \
+        --prefix=/tools     \
+        --enable-threaded-resolver
+}
+
+lfs_me_check() {
+    return
+}
+
+# vim:set syntax=sh et:

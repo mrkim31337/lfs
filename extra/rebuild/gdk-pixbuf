@@ -1,0 +1,36 @@
+pkgbuild_version=5
+pkgname=gdk-pixbuf
+pkgver=2.36.4
+
+dependencies=(
+	"!$pkgname"
+	'glib'
+	'libjpeg-turbo'
+	'libpng'
+	'libtiff'
+	'xorg-libraries'
+	'gobject-introspection'
+	'jasper'
+)
+sources=(
+	"http://ftp.gnome.org/pub/gnome/sources/${pkgname}/2.36/${pkgname}-${pkgver}.tar.xz"
+)
+sha1sums=(
+	6277b4e5b5e334b3669f15ae0376e184be9e8cd8
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+	sed -i "/seems to be moved/s/^/#/" ltmain.sh
+	cd "${build_dir}/${pkgname}-${pkgver}"
+
+	./configure --prefix=/usr --with-x11 \
+	--with-libjasper 
+
+}
+
+lfs_me_postinstall() {
+	gdk-pixbuf-query-loaders --update-cache
+}
+
+# vim:set ts=4 syntax=sh:

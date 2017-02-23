@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=ninja
+pkgver=1.7.2
+
+dependencies=(
+    "!$pkgname"
+	'Python2'
+)
+sources=(
+	
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	cd ${sources_dir}
+	wget https://github.com/ninja-build/ninja/archive/v1.7.2.tar.gz \
+     -O ninja-1.7.2.tar.gz
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure.py --bootstrap
+}
+
+lfs_me_build(){
+return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	mkdir -p ${fakeroot_dir}/usr/bin
+	install -vm755 ninja "${fakeroot_dir}/usr/bin/" 
+	install -vDm644 misc/ninja.vim \
+                ${fakeroot_dir}/usr/share/vim/vim74/syntax/ninja.vim 
+	install -vDm644 misc/bash-completion \
+                ${fakeroot_dir}/usr/share/bash-completion/completions/ninja 
+	install -vDm644 misc/zsh-completion \
+                ${fakeroot_dir}/usr/share/zsh/site-functions/_ninja
+}
+

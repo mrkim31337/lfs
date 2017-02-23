@@ -1,0 +1,31 @@
+pkgbuild_version=5
+pkgname=gpgme
+pkgver=1.8.0
+
+dependencies=(
+    "!$pkgname"
+	'libassuan'
+)
+sources=(
+	"ftp://ftp.gnupg.org/gcrypt/gpgme/${pkgname}-${pkgver}.tar.bz2"
+	"https://gitweb.gentoo.org/repo/gentoo.git/plain/app-crypt/gpgme/files/gpgme-1.8.0-cmake.patch"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i ${sources_dir}/gpgme-1.8.0-cmake.patch
+	./configure --prefix=/usr
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+	rm ${fakeroot_dir}/usr/share/info/dir
+}
+

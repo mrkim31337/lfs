@@ -1,0 +1,59 @@
+pkgbuild_version=5
+pkgname=Python3
+_pkgname=Python
+pkgver=3.6.0
+
+overwrite=(
+	'/usr/bin/python'
+	'/usr/bin/2to3'
+)
+dependencies=(
+	"!${pkgname}"
+	'libffi'
+	'berkeley-db'
+	'openssl'
+	'sqlite'
+)
+sources=(
+	"http://www.python.org/ftp/python/${pkgver}/${_pkgname}-${pkgver}.tar.xz"
+
+#	"http://docs.python.org/3.5/archives/python-${pkgver}-docs-html.tar.bz2"
+)
+sha1sums=(
+	143e098efe7ee7bec8a4904ec4b322f28a067a03
+	b51117cc70cd2920ebbb46917f3270519901e519
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${_pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+
+	CXX="/usr/bin/g++"              \
+	./configure --prefix=/usr       \
+	--enable-shared     \
+        --with-system-expat \
+        --with-system-ffi \
+	--without-ensurepip
+}
+
+lfs_me_check() {
+	return
+}
+
+lfs_me_build(){
+	 cd "${build_dir}/${_pkgname}-${pkgver}"
+	make
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+	rm Lib/test/*
+	make DESTDIR="$fakeroot_dir" install
+
+	chmod -v 755 "${fakeroot_dir}/usr/lib/libpython3.6m.so"
+	chmod -v 755 "${fakeroot_dir}/usr/lib/libpython3.so"
+
+}
+
+# vim:set ts=4 syntax=sh:

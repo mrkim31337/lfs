@@ -1,0 +1,36 @@
+pkgbuild_version=5
+pkgname=sysvinit
+pkgver=2.88dsf
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+)
+sources=(
+	
+"http://download.savannah.gnu.org/releases/sysvinit//${pkgname}-${pkgver}.tar.bz2"
+"http://www.linuxfromscratch.org/patches/lfs/development/sysvinit-2.88dsf-consolidated-1.patch"
+
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i "${sources_dir}/sysvinit-2.88dsf-consolidated-1.patch"	
+	
+	}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make -C src
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" -C src" install
+}
+

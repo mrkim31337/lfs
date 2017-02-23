@@ -1,0 +1,30 @@
+pkgbuild_version=5
+pkgname=libxml2
+pkgver=2.9.4
+
+dependencies=(
+	"!$pkgname"
+
+#	'Python<3'
+)
+sources=(
+	"http://xmlsoft.org/sources/${pkgname}-${pkgver}.tar.gz"
+	"https://raw.githubusercontent.com/fanboimsft/lfs-script/master/patches/libxml2/CVE-2016-4658"
+	"https://raw.githubusercontent.com/fanboimsft/lfs-script/master/patches/libxml2/CVE-2016-5131"
+)
+sha1sums=(
+	eb3e2146c6d68aea5c2a4422ed76fe196f933c21
+	61bca89df20f6d976409e5479eca0ca1b037d0b3
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i $sources_dir/CVE-2016-4658
+	patch -Np1 -i $sources_dir/CVE-2016-5131
+	./configure --prefix=/usr --disable-static --with-history
+
+}
+
+# vim:set ts=4 syntax=sh:

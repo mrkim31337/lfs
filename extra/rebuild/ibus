@@ -1,0 +1,48 @@
+pkgbuild_version=5
+pkgname=ibus
+pkgver=1.5.14
+
+dependencies=(
+    "!$pkgname"
+	'dconf'
+	'iso-codes'
+	'gobject-introspection'
+	'gtk+2'
+	'libnotify'
+	'vala'
+	'libxkbcommon'
+	'wayland'
+	'dbus-python'
+	'pygobject3'
+)
+sources=(
+	"https://github.com/ibus/ibus/releases/download/1.5.14/${pkgname}-${pkgver}.tar.gz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr             \
+            --sysconfdir=/etc         \
+        --enable-python-library \
+	--enable-wayland \
+	--disable-emoji-dict \
+	--with-python=python3
+
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make
+	sed -ri 's:"(/desktop):"/org/freedesktop\1:' data/ibus.schemas
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

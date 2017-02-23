@@ -1,0 +1,30 @@
+pkgbuild_version=5
+pkgname=libcdio
+pkgver=0.94
+
+dependencies=(
+    "!$pkgname"
+	'libcddb'
+)
+sources=(
+	"http://ftp.gnu.org/gnu/libcdio/${pkgname}-${pkgver}.tar.gz"
+	"http://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+0.93+1.tar.bz2"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+	tar -xf ${sources_dir}/libcdio-paranoia-10.2+0.93+1.tar.bz2 -C"$build_dir"
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr --disable-static
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+	rm ${fakeroot_dir}/usr/share/info/dir
+}
+

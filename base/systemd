@@ -1,0 +1,86 @@
+pkgbuild_version=5
+pkgname=systemd
+_pkgname=systemd-master
+pkgver=232
+
+dependencies=(
+    "!$pkgname"
+	'acl'
+	'bash'
+	'kmod'
+	'libcap'
+)
+sources=(
+
+	"https://github.com/systemd/systemd/archive/master.zip"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	unzip ${sources_dir}/master.zip -d ${build_dir}/	
+	cd "${build_dir}/${_pkgname}"
+	./autogen.sh
+
+	sed -i "s:blkid/::" $(grep -rl "blkid/blkid.h")
+        sed -e 's@test/udev-test.pl @@'  \
+    	-e 's@test-copy$(EXEEXT) @@' \
+        -i Makefile.in
+    
+    
+    	cat > config.cache << "EOF"
+KILL=/bin/kill
+MOUNT_PATH=/bin/mount
+UMOUNT_PATH=/bin/umount
+HAVE_BLKID=0
+BLKID_LIBS="-lblkid"
+BLKID_CFLAGS="-I/tools/include/blkid"
+HAVE_LIBMOUNT=1
+MOUNT_LIBS="-lmount"
+MOUNT_CFLAGS="-I/tools/include/libmount"
+cc_cv_CFLAGS__flto=no
+SULOGIN="/sbin/sulogin"
+EOF
+
+./configure --prefix=/usr            \
+            --sysconfdir=/etc        \
+            --localstatedir=/var     \
+            --config-cache           \
+            --with-rootprefix=       \
+            --with-rootlibdir=/lib   \
+            --enable-split-usr       \
+            --disable-firstboot      \
+            --disable-ldconfig       \
+            --disable-sysusers       \
+	    --disable-manpages	     \
+            --without-python         \
+            --with-default-dnssec=no \
+            --docdir=/usr/share/doc/systemd-${pkgver}
+				
+}
+
+lfs_me_build() {
+		cd "${build_dir}/${_pkgname}"
+		make LIBRARY_PATH=/tools/lib
+}
+
+
+lfs_me_install() {
+		cd "${build_dir}/${_pkgname}"
+		make LD_LIBRARY_PATH=/tools/lib DESTDIR="${fakeroot_dir}" install
+
+		rm -rfv "${fakeroot_dir}/usr/lib/rpm"
+		mkdir ${fakeroot_dir}/sbin
+
+		for tool in runlevel reboot shutdown poweroff halt telinit; do
+     		ln -sfv ../bin/systemctl ${fakeroot_dir}/sbin/${tool}
+		done
+		ln -sfv ../lib/systemd/systemd ${fakeroot_dir}/sbin/init
+}
+
+lfs_me_postinstall() {
+	systemd-machine-id-setup
+}
+
+# vim:set syntax=sh et:

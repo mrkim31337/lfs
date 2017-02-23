@@ -1,0 +1,41 @@
+pkgbuild_version=5
+pkgname=vte
+pkgver=0.46.1
+
+dependencies=(
+    "!$pkgname"
+	'gtk+'
+	
+)
+sources=(
+	"https://download.gnome.org/sources/vte/0.46/${pkgname}-${pkgver}.tar.xz"
+	
+"http://pkgs.fedoraproject.org/cgit/rpms/vte291.git/plain/vte291-command-notify-scroll-speed.patch?h=f25"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -p1 -i "${sources_dir}/vte291-command-notify-scroll-speed.patch?h=f25"
+	./configure --prefix='/usr' --sysconfdir='/etc' \
+		--libexecdir='/usr/lib/vte' \
+		--localstatedir='/var' --disable-static \
+		--enable-introspection 
+	sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make
+}
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+	mkdir -pv ${fakeroot_dir}/etc/profile.d/
+	install -Dm644 'src/vte.sh' "${fakeroot_dir}/etc/profile.d/vte.sh"
+}
+

@@ -1,0 +1,42 @@
+pkgbuild_version=5
+pkgname=libvdpau-va-gl
+pkgver=0.4.0
+
+dependencies=(
+	"!$pkgname"
+	'xorg-libraries'
+	'cmake'
+	'ffmpeg'
+	'libvdpau'
+	'libva'
+)
+sources=(
+	"https://github.com/i-rinat/libvdpau-va-gl/archive/v${pkver}.tar.gz"
+)
+sha1sums=(
+	7eefd24a49e96aa87c576c8ac46d04cc5a368a4f
+)
+
+lfs_me_prepare() {
+	
+
+	mv "${sources_dir}/v0.4.0.tar.gz" "${sources_dir}/${pkgname}-${pkgver}.tar.gz"
+ 	tar -xf "${sources_dir}/${pkgname}-${pkgver}" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+
+	mkdir build
+
+}
+lfs_me_install(){
+	cd "${build_dir}/${pkgname}-${pkgver}/build"
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$XORG_PREFIX .. &&
+	make
+}
+
+lfs_me_postinstall(){
+
+echo "setting up environment variable"
+echo "export VDPAU_DRIVER=va_gl" >> /etc/profile.d/xorg.sh
+
+# vim:set ts=4 syntax=sh:

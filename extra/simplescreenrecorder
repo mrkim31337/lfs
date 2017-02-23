@@ -1,0 +1,46 @@
+pkgbuild_version=5
+pkgname=simplescreenrecorder
+_pkgname=ssr
+pkgver=git
+CXXFLAGS="$CXXFLAGS -fPIC"
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'alsa-lib'
+	'desktop-file-utils'
+	'ffmpeg'
+	'glu'
+	'mesa'
+	'pulseaudio'
+	'qt'
+	'jack'
+)
+sources=(
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+
+	cd $build_dir
+	git clone https://github.com/MaartenBaert/ssr
+	cd "${build_dir}/${_pkgname}"
+	./autogen.sh
+	./configure --prefix=/usr --with-qt5
+}
+
+lfs_me_build(){
+	cd "${build_dir}/${_pkgname}"
+
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${_pkgname}"
+	make DESTDIR="$fakeroot_dir" install
+}
+
+lfs_me_postinstall(){
+	gtk-update-icon-cache /usr/share/icons/hicolor
+}

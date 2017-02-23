@@ -1,0 +1,58 @@
+pkgbuild_version=5
+pkgname=qtwebkit
+_pkgname=qtwebkit-opensource-src
+pkgver=5.8.0
+
+dependencies=(
+    "!$pkgname"
+	'icu'
+	'libjpeg-turbo'
+	'libpng'
+	'libwebp'
+	'libxslt'
+	'qt>5.7'
+	'ruby'
+	'sqlite'
+	'gst-plugins-base'
+	'flex'
+)
+sources=(
+	"http://download.qt.io/community_releases/5.8/${pkgver}/${_pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${_pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+	SAVEPATH=$PATH
+	export PATH=$PWD/bin:$PATH
+	mkdir build
+	cd build
+	qmake ../WebKit.pro
+	make -j5
+	export PATH=$SAVEPATH
+	unset SAVEPATH
+}
+lfs_me_build(){
+	return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${_pkgname}-${pkgver}/build"
+	make INSTALL_ROOT="$fakeroot_dir" install
+	
+}
+
+lfs_me_postinstall(){
+	find $QT5DIR/lib/pkgconfig -name "*.pc" -exec perl -pi -e "s, -L$PWD/?\S+,,g" {} \;
+	find $QT5DIR/ -name qt_lib_bootstrap_private.pri \
+        -exec sed -i -e "s:$PWD/qtbase:/$QT5DIR/lib/:g" {} \;
+
+	find $QT5DIR/ -name \*.prl \
+        -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+}
+

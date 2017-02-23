@@ -1,0 +1,51 @@
+pkgbuild_version=5
+pkgname=sddm
+pkgver=0.14.0
+
+dependencies=(
+    "!$pkgname"
+	'cmake'
+	'extra-cmake-modules'
+	'qt'
+	'Linux-PAM>'
+	'upower'
+)
+sources=(
+	
+	"https://github.com/sddm/sddm/releases/download/v0.14.0/${pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	cmake -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_BUILD_TYPE=Release  \
+        -Wno-dev . 
+
+}
+#lfs_me_build(){
+#	cd "${build_dir}/${pkgname}-${pkgver}"
+#	make -j5
+#}
+lfs_me_install() {
+	groupadd -g 64 sddm
+        useradd  -c "SDDM Daemon" \
+         -d /var/lib/sddm \
+         -u 64 -g sddm    \
+         -s /bin/false sddm
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+	install -v -dm755 -o sddm -g sddm ${fakeroot_dir}/var/lib/sddm
+}
+
+lfs_me_postremove(){
+	groupdel sddm
+	userdel sddm
+
+
+}

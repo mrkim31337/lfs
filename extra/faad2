@@ -1,0 +1,32 @@
+pkgbuild_version=5
+pkgname=faad2
+pkgver=2.7
+
+dependencies=(
+    "!$pkgname"
+)
+sources=(
+	"http://downloads.sourceforge.net/faac/${pkgname}-${pkgver}.tar.bz2"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/faad2-2.7-mp4ff-1.patch"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.bz2" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	patch -Np1 -i ${sources_dir}/faad2-2.7-mp4ff-1.patch
+	sed -i "s:AM_CONFIG_HEADER:AC_CONFIG_HEADERS:g" configure.in 
+	sed -i "s:man_MANS:man1_MANS:g" frontend/Makefile.am
+	autoreconf -fi
+	./configure --prefix=/usr --disable-static
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
+

@@ -1,0 +1,39 @@
+pkgbuild_version=5
+pkgname=FreeRDP
+pkgver=git
+
+dependencies=(
+	"!$pkgname"
+)
+sources=(
+	
+	)
+sha1sums=(
+	e0d10e8b4494383c7e366ac80a942ba45a705a96
+)
+
+lfs_me_prepare() {
+	
+	cd ${build_dir}
+	git clone https://github.com/FreeRDP/FreeRDP
+	cd "${build_dir}/${pkgname}"
+	cmake -DCMAKE_BUILD_TYPE=Release -DWITH_SSE2=ON \
+	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DWITH_WAYLAND=ON \
+	-DWITH_GSTREAMER_1_0=OFF \
+	 .
+
+}
+
+lfs_me_build() {
+	cd "${build_dir}/${pkgname}"
+	make
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}"
+	make DESTDIR="${fakeroot_dir}" install
+
+}
+

@@ -1,0 +1,30 @@
+pkgbuild_version=5
+pkgname=xz
+pkgver=5.2.3
+
+dependencies=(
+    "!$pkgname"
+	'bash'
+)
+sources=(
+	"http://tukaani.org/${pkgname}/${pkgname}-${pkgver}.tar.xz"
+)
+sha1sums=(
+    586e4a49330b3a483d95965bac295120bd2e8917
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr --disable-static \
+	--docdir="/usr/share/doc/${pkgname}-${pkgver}"
+}
+
+lfs_me_install() {
+    cd "${build_dir}/${pkgname}-${pkgver}"
+    make DESTDIR="$fakeroot_dir" install
+
+}
+
+

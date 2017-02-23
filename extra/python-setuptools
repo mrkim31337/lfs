@@ -1,0 +1,33 @@
+pkgbuild_version=5
+pkgname=python-setuptools
+_pkgname=setuptools
+pkgver=30.2.0
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'Python2'
+	'Python3'
+)
+sources=(
+"https://pypi.python.org/packages/f1/92/12c7251039b274c30106c3e0babdcb040cbd13c3ad4b3f0ef9a7c217e36a/${_pkgname}-${pkgver}.tar.gz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${_pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+	return
+}
+lfs_me_build() {
+	return
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${_pkgname}-${pkgver}"
+	python2 setup.py install --optimize=1 --prefix=/usr --root="$fakeroot_dir"
+	python3 setup.py install --optimize=1 --prefix=/usr --root="$fakeroot_dir"
+
+}
+

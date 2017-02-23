@@ -1,0 +1,44 @@
+pkgbuild_version=5
+pkgname=openssl
+pkgver=1.0.2k
+
+dependencies=(
+    "!$pkgname"
+	'perl'
+    'zlib'
+)
+sources=(
+    "http://www.openssl.org/source/${pkgname}-${pkgver}.tar.gz"
+)
+sha1sums=(
+    4547a0b4269acf76b1f9e7d188896867d6fc8c18
+    0236daae8cf60962242685d64eb0f06d434d4124
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.gz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+
+
+    
+    	./config                  \
+        --prefix=/usr	       \
+        --openssldir=/etc/ssl \
+        shared                \
+        zlib-dynamic
+
+	make depend
+}
+
+lfs_me_check() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make test
+}
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make INSTALL_PREFIX="${fakeroot_dir}" MANDIR="/usr/share/man" MANSUFFIX=ssl install
+}
+
+# vim:set syntax=sh et:

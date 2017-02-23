@@ -1,0 +1,60 @@
+pkgbuild_version=5
+pkgname=gtk+
+pkgname2=gtk+
+pkgver=3.22.8
+
+dependencies=(
+	"!$pkgname"
+	'atk'
+	'at-spi2-core'
+	'at-spi2-atk'
+	'gdk-pixbuf'
+	'libepoxy'
+	'pango'
+	'hicolor-icon-theme'
+	'gobject-introspection'
+	'colord'
+	'cups'
+	'json-glib'
+	'libxkbcommon'
+	'rest'
+	'wayland'
+	'wayland-protocols'
+	'librsvg'
+)
+sources=(
+	"http://ftp.gnome.org/pub/gnome/sources/gtk+/3.22/${pkgname2}-${pkgver}.tar.xz"
+)
+sha1sums=(
+	c43eb248b3d30c6b49937692b4c4bfa10b96201e
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname2}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname2}-${pkgver}"
+	sed -i "/seems to be moved/s/^/#/" build-aux/ltmain.sh &&
+	./configure --prefix=/usr             \
+            --sysconfdir=/etc         \
+            --enable-broadway-backend \
+            --enable-x11-backend \
+	    --enable-wayland-backend
+
+}
+lfs_me_build(){
+	cd "${build_dir}/${pkgname2}-${pkgver}"
+	make
+}
+lfs_me_install() {
+        cd "${build_dir}/${pkgname2}-${pkgver}"
+        make DESTDIR="${fakeroot_dir}" install
+
+
+}
+
+lfs_me_postinstall() {
+	gtk-query-immodules-3.0 --update-cache
+	glib-compile-schemas /usr/share/glib-2.0/schemas
+}
+
+# vim:set ts=4 syntax=sh:

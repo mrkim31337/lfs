@@ -1,0 +1,35 @@
+pkgbuild_version=5
+pkgname=cogl
+pkgver=1.22.2
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'cairo'
+	'gdk-pixbuf'
+	'glu'
+	'mesa'
+	'pango'
+	'gobject-introspection'
+
+)
+sources=(
+	"/${pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" DOCDIR="/usr/share/doc/${pkgname}-${pkgver}" install
+}
+
