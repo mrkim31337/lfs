@@ -30,26 +30,26 @@ lfs_me_build() {
 	export SRCDIR=`pwd`
 	cd unix
 
-	make &&
+	make
 
 #	sed -e "s@^\(TCL_SRC_DIR='\).*@\1/usr/include'@" \
 #	    -e "/TCL_B/s@='\(-L\)\?.*unix@='\1/usr/lib@" \
-#		    -i tclConfig.sh &&
+#		    -i tclConfig.sh
 
 sed -e "s#$SRCDIR/unix#/usr/lib#" \
     -e "s#$SRCDIR#/usr/include#"  \
-    -i tclConfig.sh               &&
+    -i tclConfig.sh               
 
 sed -e "s#$SRCDIR/unix/pkgs/tdbc1.0.4#/usr/lib/tdbc1.0.4#" \
     -e "s#$SRCDIR/pkgs/tdbc1.0.4/generic#/usr/include#"    \
     -e "s#$SRCDIR/pkgs/tdbc1.0.4/library#/usr/lib/tcl8.6#" \
     -e "s#$SRCDIR/pkgs/tdbc1.0.4#/usr/include#"            \
-    -i pkgs/tdbc1.0.4/tdbcConfig.sh                        &&
+    -i pkgs/tdbc1.0.4/tdbcConfig.sh                        
 
 sed -e "s#$SRCDIR/unix/pkgs/itcl4.0.5#/usr/lib/itcl4.0.5#" \
     -e "s#$SRCDIR/pkgs/itcl4.0.5/generic#/usr/include#"    \
     -e "s#$SRCDIR/pkgs/itcl4.0.5#/usr/include#"            \
-    -i pkgs/itcl4.0.5/itclConfig.sh                        &&
+    -i pkgs/itcl4.0.5/itclConfig.sh                        
 
 unset SRCDIR
 
@@ -63,12 +63,12 @@ lfs_me_check() {
 
 lfs_me_install() {
 	cd "${build_dir}/${pkgname}${pkgver}/unix"
-	make DESTDIR="$fakeroot_dir" install &&
-	make DESTDIR="$fakeroot_dir" install-private-headers &&
-	ln -v -sf tclsh8.6 "${fakeroot_dir}/usr/bin/tclsh" &&
+	make DESTDIR="$fakeroot_dir" install 
+	make DESTDIR="$fakeroot_dir" install-private-headers 
+	ln -v -sf tclsh8.6 "${fakeroot_dir}/usr/bin/tclsh" 
 	chmod -v 755 "${fakeroot_dir}/usr/lib/libtcl8.6.so"
 
-	mkdir -v -p "${fakeroot_dir}/usr/share/doc/${pkgname}-${pkgver}" &&
+	mkdir -v -p "${fakeroot_dir}/usr/share/doc/${pkgname}-${pkgver}" 
 	cp -v -r  ../html/* "${fakeroot_dir}/usr/share/doc/${pkgname}-${pkgver}"
 }
 

@@ -1,7 +1,7 @@
 pkgbuild_version=5
 pkgname=thunderbird-bin
 _pkgname=thunderbird
-pkgver=45.7.0
+pkgver=45.7.1
 
 dependencies=(
     "!$pkgname"
@@ -41,4 +41,25 @@ pathappend $THUNDERDIR
 EOF
 
 	tar -xiC "${fakeroot_dir}/opt/" -f ${_pkgname}-${pkgver}.tar.bz2
+
+mkdir -pv ${fakeroot_dir}/usr/share/{applications,pixmaps}
+
+cat > ${fakeroot_dir}/usr/share/applications/thunderbird.desktop << "EOF"
+[Desktop Entry]
+Encoding=UTF-8
+Name=Thunderbird Mail
+Comment=Send and receive mail with Thunderbird
+GenericName=Mail Client
+Exec=/opt/thunderbird/thunderbird %u
+Terminal=false
+Type=Application
+Icon=thunderbird
+Categories=Application;Network;Email;
+MimeType=application/xhtml+xml;text/xml;application/xhtml+xml;application/xml;application/rss+xml;x-scheme-handler/mailto;
+StartupNotify=true
+EOF
+
+ln -sfv /opt/thunderbird/chrome/icons/default/default256.png \
+        ${fakeroot_dir}/usr/share/pixmaps/thunderbird.png
+
 }

@@ -1,0 +1,31 @@
+pkgbuild_version=5
+pkgname=transmission
+pkgver=2.92
+
+dependencies=(
+    "!$pkgname"
+	'glibc'
+	'curl'
+	'libevent'
+	'openssl'
+	'gtk+'
+)
+sources=(
+	"https://transmission.cachefly.net/${pkgname}-${pkgver}.tar.xz"
+)
+
+sha1sums=(
+)
+
+lfs_me_prepare() {
+	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
+
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	./configure --prefix=/usr
+}
+
+
+lfs_me_install() {
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	make DESTDIR="$fakeroot_dir" install
+}
