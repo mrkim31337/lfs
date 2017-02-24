@@ -8,7 +8,7 @@ dependencies=(
 )
 sources=(
 	"http://download.icu-project.org/files/${pkgname}4c/${pkgver}/${pkgname}4c-${pkgver/\./_}-src.tgz"
-	"http://www.linuxfromscratch.org/patches/blfs/svn/icu4c-58.2-fix_enumeration-1.patch"
+	"http://www.linuxfromscratch.org/patches/blfs/svn/icu4c-${pkgver}-fix_enumeration-1.patch"
 )
 sha1sums=(
 	7eca017fdd101e676d425caaf28ef862d3655e0f
@@ -17,8 +17,9 @@ sha1sums=(
 lfs_me_prepare() {
 	tar -xf "${sources_dir}/${pkgname}4c-${pkgver/\./_}-src.tgz" -C "$build_dir"
 
-	cd "${build_dir}/${pkgname}/source"
-	patch -Np1 -i $source_dir/icu4c-58.2-fix_enumeration-1.patch
+	cd "${build_dir}/${pkgname}"
+	patch -p1 -i ${sources_dir}/icu4c-${pkgver}-fix_enumeration-1.patch
+	cd source
 	./configure --prefix=/usr
 }
 

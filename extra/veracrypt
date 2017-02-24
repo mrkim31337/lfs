@@ -6,6 +6,7 @@ pkgver=1.19
 dependencies=(
     "!$pkgname"
 	'glibc'
+	'wxgtk'
 )
 sources=(
 	
@@ -37,7 +38,7 @@ lfs_me_install() {
 	mkdir -pv ${fakeroot_dir}/usr/share/pixmaps
 	install -Dm 755 Main/${pkgname} "${fakeroot_dir}/usr/bin/${pkgname}"
   	install -Dm 644 Resources/Icons/VeraCrypt-256x256.xpm "${fakeroot_dir}/usr/share/pixmaps/veracrypt.xpm"
-
+	install -Dm 644 Setup/Linux/veracrypt.desktop -t "${fakeroot_dir}/usr/share/applications"
 
 }
 
