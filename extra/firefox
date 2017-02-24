@@ -74,12 +74,12 @@ ac_add_options --enable-startup-notification
 
 # Comment out following options if you have not installed
 # recommended dependencies:
-#ac_add_options --enable-system-sqlite
-#ac_add_options --with-system-libevent
-#ac_add_options --with-system-libvpx
-#ac_add_options --with-system-nspr
-#ac_add_options --with-system-nss
-#ac_add_options --with-system-icu
+ac_add_options --enable-system-sqlite
+ac_add_options --with-system-libevent
+ac_add_options --with-system-libvpx
+ac_add_options --with-system-nspr
+ac_add_options --with-system-nss
+ac_add_options --with-system-icu
 
 # If you are going to apply the patch for system graphite
 # and system harfbuzz, uncomment these lines:
@@ -123,8 +123,8 @@ mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/firefox-build-dir
 EOF
 
 	patch -Np1 -i ${sources_dir}/firefox-${pkgver}-system_graphite2_harfbuzz-1.patch
-#	sed -e s/_EVENT_SIZEOF/EVENT__SIZEOF/ \
-#    -i ipc/chromium/src/base/message_pump_libevent.cc
+	sed -e s/_EVENT_SIZEOF/EVENT__SIZEOF/ \
+        -i ipc/chromium/src/base/message_pump_libevent.cc
 }
 
 lfs_me_build(){
