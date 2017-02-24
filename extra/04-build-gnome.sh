@@ -241,6 +241,14 @@ install=(
 'gnome-terminal'
 'sound-theme-freedesktop'
 'dejavu-fonts-ttf'
+'XML-SAX-Expat'
+'XML-LibXML'
+'Tie-IxHash'
+'XML-Simple'
+'icon-naming-utils'
+'gnome-icon-theme'
+'gnome-icon-theme-extras'
+'gnome-icon-theme-symbolic'
 )
 
 mkdir -v pkg

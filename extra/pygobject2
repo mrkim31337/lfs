@@ -2,7 +2,6 @@ pkgbuild_version=5
 pkgname=pygobject2
 _pkgname=pygobject
 pkgver=2.28.6
-
 dependencies=(
     "!$pkgname"
 	'glib'
@@ -22,19 +21,18 @@ lfs_me_prepare() {
 
 	cd "${build_dir}/${_pkgname}-${pkgver}"
 	patch -Np1 -i ${sources_dir}/pygobject-2.28.6-fixes-1.patch 
-	sed -i "/seems to be moved/s/^/#/" ltmain.sh &&
-	./configure --prefix=/usr
+	sed -i "/seems to be moved/s/^/#/" ltmain.sh
+	PYTHON=/usr/bin/python2 ./configure --prefix=/usr --disable-introspection
 }
 
 lfs_me_build() {
-
 	cd "${build_dir}/${_pkgname}-${pkgver}"
-	make
+	PYTHON=/usr/bin/python2 make
 }
 
 
 lfs_me_install() {
 	cd "${build_dir}/${_pkgname}-${pkgver}"
-	make DESTDIR="$fakeroot_dir" install
+	PYTHON=/usr/bin/python2 make DESTDIR="$fakeroot_dir" install
 }
 

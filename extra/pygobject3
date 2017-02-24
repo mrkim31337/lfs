@@ -7,6 +7,7 @@ dependencies=(
     "!$pkgname"
 	'glib'
 	'pycairo'
+	'py2cairo'
 )
 sources=(
 	
@@ -18,14 +19,19 @@ sha1sums=(
 
 lfs_me_prepare() {
 	tar -xf "${sources_dir}/${_pkgname}-${pkgver}.tar.xz" -C "$build_dir"
-
 	cd "${build_dir}/${_pkgname}-${pkgver}"
+
+	mkdir python2
+	pushd python2
+	../configure --prefix=/usr --with-python=/usr/bin/python2
+	make
+	popd
+	
 	mkdir python3
 	pushd python3
 	../configure --prefix=/usr --with-python=/usr/bin/python3
 	make
 	popd
-
 }
 
 lfs_me_build() {
@@ -36,6 +42,7 @@ lfs_me_build() {
 
 lfs_me_install() {
 	cd "${build_dir}/${_pkgname}-${pkgver}"
+	make DESTDIR=${fakeroot_dir} -C python2 install
 	make DESTDIR=${fakeroot_dir} -C python3 install
-}
+}	
 

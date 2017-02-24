@@ -21,10 +21,7 @@ lfs_me_prepare() {
 
 	cd "${build_dir}/${pkgname}-${pkgver}"
 	sed -i -r 's:"(/system):"/org/gnome\1:g' schemas/*.in 
-	./configure --prefix=/usr                
-
-
-
+	./configure --prefix=/usr
 }
 
 lfs_me_build() {

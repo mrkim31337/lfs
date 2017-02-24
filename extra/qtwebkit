@@ -10,14 +10,14 @@ dependencies=(
 	'libpng'
 	'libwebp'
 	'libxslt'
-	'qt>5.7'
+	'qt'
 	'ruby'
 	'sqlite'
 	'gst-plugins-base'
 	'flex'
 )
 sources=(
-	"http://download.qt.io/community_releases/5.8/${pkgver}/${_pkgname}-${pkgver}.tar.xz"
+	"http://download.qt.io/community_releases/5.8/${pkgver}-final/${_pkgname}-${pkgver}.tar.xz"
 )
 
 sha1sums=(

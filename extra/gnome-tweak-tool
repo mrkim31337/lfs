@@ -6,7 +6,7 @@ dependencies=(
     "!$pkgname"
 	'glibc'
 	'gsettings-desktop-schemas'
-	'pygobject2'
+	'pygobject3'
 	'gtk+'
 )
 sources=(
@@ -18,14 +18,19 @@ sha1sums=(
 
 lfs_me_prepare() {
 	tar -xf "${sources_dir}/${pkgname}-${pkgver}.tar.xz" -C "$build_dir"
-
+	
 	cd "${build_dir}/${pkgname}-${pkgver}"
-	./configure --prefix=/usr
+	sed -i '1s|python$|&2|' gnome-tweak-tool
+	PYTHON=/usr/bin/python2 ./configure --prefix=/usr
 
 }
 
+lfs_me_build(){
+	cd "${build_dir}/${pkgname}-${pkgver}"
+	PYTHON=/usr/bin/python2 make
+}
 
 lfs_me_install() {
 	cd "${build_dir}/${pkgname}-${pkgver}"
-	make DESTDIR="$fakeroot_dir" install
+        PYTHON=/usr/bin/python2	make DESTDIR="$fakeroot_dir" install
 }
